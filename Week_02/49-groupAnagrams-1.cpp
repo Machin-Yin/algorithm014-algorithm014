@@ -3,8 +3,10 @@
  *
  * [49] 字母异位词分组
  * 
- * 先遍历strs，对每个string进行排序，异位词的排序结果是一样的，
- * 在map中的key值也就一样，然后在map中添加对应的vector，再将vector逐个添加到res中
+ * 因为要找组成一样的单词，如何判断？
+ * 最简单的，一排序，如果是同一个单词，那么就是组成一样的
+ * 比如 “eat” "tea" 排序后都为 “aet”
+ * 只要引入一个hash表，索引是排序后的单词，值为结果vector的下标，循环一遍就好了
  */
 
 // @lc code=start
@@ -12,14 +14,21 @@ class Solution {
 public:
     vector<vector<string>> groupAnagrams(vector<string>& strs) {
         vector<vector<string>> res;
-        unordered_map <string, vector<string> > map;
-        for (auto &str:strs) {
-            string tmp = str;
+        int sub = 0;    //结果vector的下标值
+        string tmp;     //临时string
+        unordered_map<string, int> work; //判断排序后单词是否存在，即字母组成是否一致
+        for (auto str:strs) {
+            tmp = str;
             sort(tmp.begin(), tmp.end());
-            map[tmp].push_back(str);
+            if (work.count(tmp)) {
+                res[work[tmp]].push_back(str);
+            }
+            else {
+                vector<string> vec(1, str);
+                res.push_back(vec);
+                work[tmp] = sub++;
+            }
         }
-        for (auto &n : map) 
-            res.push_back(n.second);
         return res;
     }
 };
